@@ -1,32 +1,37 @@
 <template>
   <div class="search-container">
-    <input
-      type="text"
-      v-model="title"
-      placeholder="Введите название экскурсии"
-    />
+    <h1>Экскурсии по всему миру</h1>
+    <div class="filters">
+      <input
+        class="excursion-name-search"
+        type="text"
+        v-model="title"
+        placeholder="Введите название экскурсии"
+      />
 
-    <select v-model="selectedCity">
-      <option value="">Выбрать город</option>
-      <option v-for="city in cities" :key="city.id" :value="city.id">
-        {{ city.name }}
-      </option>
-    </select>
-
-    <button @click="searchExcursions">Поиск</button>
-    <button @click="resetFilters">Сбросить фильтры</button>
+      <select v-model="selectedCity">
+        <option value="">Выбрать город</option>
+        <option v-for="city in cities" :key="city.id" :value="city.id">
+          {{ city.name }}
+        </option>
+      </select>
+    </div>
 
     <div v-if="filteredExcursions.length === 0">
       <p>Поиск не дал результатов</p>
     </div>
 
-    <div v-else>
+    <div class="excursion-list" v-else>
       <div
         v-for="excursion in filteredExcursions"
         :key="excursion.id"
         class="excursion-card"
       >
-        <img :src="excursion.image_big" alt="Катинка экскурсии" />
+        <img
+          :src="excursion.image_big"
+          class="excursion-image"
+          alt="Катинка экскурсии"
+        />
         <h3>{{ excursion.title }}</h3>
         <p>Рейтинг: {{ excursion.rating }}</p>
         <p>Цена: {{ excursion.price }} руб</p>
@@ -74,14 +79,6 @@ export default defineComponent({
         return matchesTitle && matchesCity;
       });
     });
-
-    const searchExcursions = () => {};
-
-    const resetFilters = () => {
-      title.value = "";
-      selectedCity.value = "";
-    };
-
     onMounted(() => {
       loadExcursions();
       loadCities();
@@ -93,8 +90,6 @@ export default defineComponent({
       excursions,
       cities,
       filteredExcursions,
-      searchExcursions,
-      resetFilters,
     };
   },
 });
@@ -105,14 +100,54 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-width: 600px;
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+.filters {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  justify-items: center;
   margin: auto;
+  gap: 1rem;
+}
+.excursion-name-search {
+  width: 400px;
+  height: 30px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.excursion-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  margin-top: 20px;
+  margin-left: 30px;
 }
 
 .excursion-card {
-  border: 1px solid #ddd;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-top: 1rem;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  gap: 0.5rem;
+  margin-bottom: 10px;
+}
+
+.excursion-image {
+  border-radius: 10px;
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+h3,
+p {
+  margin: 0;
 }
 </style>
