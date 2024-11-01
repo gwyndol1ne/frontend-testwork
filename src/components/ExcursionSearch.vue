@@ -32,9 +32,14 @@
           class="excursion-image"
           alt="Катинка экскурсии"
         />
+        <div class="rating-container">
+          <img src="@/assets/star.png" alt="Звезда" class="star-image" />
+          <p class="rating-text">
+            {{ excursion.customers_review_rating }} ({{ excursion.reviews }})
+          </p>
+        </div>
         <h3>{{ excursion.title }}</h3>
-        <p>Рейтинг: {{ excursion.rating }}</p>
-        <p>Цена: {{ excursion.price }} руб</p>
+        <h3>От {{ excursion.price }}</h3>
       </div>
     </div>
   </div>
@@ -149,5 +154,17 @@ h1 {
 h3,
 p {
   margin: 0;
+}
+.rating-container {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.star-image {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <img alt="Sputnik logo" src="./assets/logo.png" />
+  <img alt="Sputnik logo" src="./assets/logo.png" class="sputnik-logo" />
   <ExcursionSearch />
 </template>
 
@@ -15,9 +15,11 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  text-align: center;
   color: #2c3e50;
   margin-top: 60px;
 }
