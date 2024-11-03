@@ -69,6 +69,7 @@
 <script>
 import { defineComponent, ref, onMounted, computed } from "vue";
 import { getExcursions, getCities } from "@/services/apiService.ts";
+import Fuse from "fuse.js";
 
 export default defineComponent({
   name: "ExcursionSearch",
@@ -78,10 +79,16 @@ export default defineComponent({
     const excursions = ref([]);
     const cities = ref([]);
     const showSuggestions = ref(false);
+    const fuse = ref(null);
 
     const loadExcursions = async () => {
       try {
         excursions.value = await getExcursions();
+        fuse.value = new Fuse(excursions.value, {
+          keys: ["title"],
+          includeScore: true,
+          threshold: 0.45,
+        });
       } catch (error) {
         console.error("Ошибка при загрузке экскурсий:", error);
       }
@@ -95,27 +102,29 @@ export default defineComponent({
       }
     };
 
-    const excursionTitles = computed(() =>
-      excursions.value.map((excursion) => excursion.title)
-    );
-
     const filteredSuggestions = computed(() =>
-      excursionTitles.value.filter((t) =>
-        t.toLowerCase().includes(title.value.toLowerCase())
-      )
+      excursions.value
+        .map((excursion) => excursion.title)
+        .filter((t) => t.toLowerCase().includes(title.value.toLowerCase()))
     );
 
     const filteredExcursions = computed(() => {
-      return excursions.value.filter((excursion) => {
-        const matchesTitle = excursion.title
-          .toLowerCase()
-          .includes(title.value.toLowerCase());
-        const matchesCity = selectedCity.value
-          ? excursion.city_id === selectedCity.value
-          : true;
-        return matchesTitle && matchesCity;
-      });
+      const cityFilteredExcursions = selectedCity.value
+        ? excursions.value.filter(
+            (excursion) => excursion.city_id === selectedCity.value
+          )
+        : excursions.value;
+      if (!fuse.value || title.value.trim() === "")
+        return cityFilteredExcursions;
+      const results = fuse.value.search(title.value);
+      return cityFilteredExcursions.filter((excursion) =>
+        results.map((result) => result.item.id).includes(excursion.id)
+      );
     });
+
+    const updateSearch = () => {
+      showSuggestions.value = title.value.length > 0;
+    };
 
     const selectSuggestion = (suggestion) => {
       title.value = suggestion;
@@ -136,6 +145,7 @@ export default defineComponent({
       filteredSuggestions,
       showSuggestions,
       selectSuggestion,
+      updateSearch,
     };
   },
 });
@@ -272,9 +282,16 @@ p {
   margin-right: 4px;
 }
 .short-info {
-  font-size: 16px;
-  color: #333;
+  font-size: 18px;
   text-align: left;
   padding: 10px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.image-container:hover .short-info {
+  transform: scale(1.05);
 }
 </style>
