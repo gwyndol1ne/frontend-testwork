@@ -10,6 +10,7 @@
           placeholder="Введите название экскурсии"
           @input="showSuggestions = title.length > 0"
         />
+        <button v-if="title" class="clear-button" @click="clearInput">×</button>
 
         <ul
           v-if="showSuggestions && filteredSuggestions.length"
@@ -35,6 +36,9 @@
 
     <div v-if="filteredExcursions.length === 0">
       <p>Поиск не дал результатов</p>
+      <button class="reset-button" @click="resetFilters">
+        Сбросить фильтры
+      </button>
     </div>
 
     <div class="excursion-list" v-else>
@@ -87,7 +91,7 @@ export default defineComponent({
         fuse.value = new Fuse(excursions.value, {
           keys: ["title"],
           includeScore: true,
-          threshold: 0.45,
+          threshold: 0.4,
         });
       } catch (error) {
         console.error("Ошибка при загрузке экскурсий:", error);
@@ -122,12 +126,14 @@ export default defineComponent({
       );
     });
 
-    const updateSearch = () => {
-      showSuggestions.value = title.value.length > 0;
+    const clearInput = () => {
+      title.value = "";
+      showSuggestions.value = false;
     };
 
-    const selectSuggestion = (suggestion) => {
-      title.value = suggestion;
+    const resetFilters = () => {
+      title.value = "";
+      selectedCity.value = "";
       showSuggestions.value = false;
     };
 
@@ -144,8 +150,8 @@ export default defineComponent({
       filteredExcursions,
       filteredSuggestions,
       showSuggestions,
-      selectSuggestion,
-      updateSearch,
+      clearInput,
+      resetFilters,
     };
   },
 });
@@ -173,6 +179,7 @@ export default defineComponent({
 .excursion-name-search {
   font-size: 16px;
   padding-left: 10px;
+  padding-right: 30px;
   border: 1px solid #ccc;
   border-radius: 8px;
   width: 500px;
@@ -182,6 +189,24 @@ export default defineComponent({
 .excursion-name-search:focus {
   border-color: #007bff;
 }
+.clear-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #999;
+  cursor: pointer;
+}
+.clear-button:hover {
+  color: #000;
+}
+.suggestions-list::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
 select {
   width: 250px;
   padding: 10px;
@@ -190,13 +215,15 @@ select {
   background-color: #ffffff;
   color: #333;
   font-size: 16px;
-  appearance: none;
-  outline: none;
   cursor: pointer;
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 select:focus {
   border-color: #007bff;
+}
+select::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 .suggestions-list {
   border: 1px solid #ccc;
@@ -208,8 +235,6 @@ select:focus {
   list-style-type: none;
   padding: 0;
   position: absolute;
-  left: 0;
-  right: 0;
   z-index: 1000;
 }
 .suggestions-list li {
@@ -228,7 +253,7 @@ h1 {
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   width: 100%;
-  margin-top: 20px;
+  margin-top: 2px;
   margin-left: 30px;
 }
 .excursion-card {
@@ -236,9 +261,8 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 0;
-  gap: 0.5rem;
-  margin-bottom: 10px;
+  gap: 2px;
+  scale: 80%;
 }
 .excursion-image {
   border-radius: 10px;
@@ -290,8 +314,21 @@ p {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease;
 }
-
 .image-container:hover .short-info {
   transform: scale(1.05);
+}
+.reset-button {
+  display: block;
+  margin: 20px auto;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.reset-button:hover {
+  background-color: #0056b3;
 }
 </style>
